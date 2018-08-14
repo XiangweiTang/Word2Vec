@@ -57,7 +57,7 @@ def read_data(filename):
 		data=tf.compat.as_str(f.read(f.namelist()[0])).split()
 	return data
 
-recuit_wbr="D:\\private\\20180814_Data\\Wbr\\total\\total.txt"
+recuit_wbr="total.txt"
 
 def read_to_word(filename):
 	with open(filename,'r',encoding='UTF-8') as f:
@@ -65,11 +65,12 @@ def read_to_word(filename):
 			for word in line.split():
 				yield word
 
-vocabulary=list( read_to_word(recuit_wbr))
+vocabulary=list(read_to_word(recuit_wbr))
 print('Data size ', len(vocabulary))
 
 #	Build dictionary, replace rare words with UNK.
 vocabulary_size=20000
+num_steps=100001
 
 def build_dataset(words, n_words):
 	count=[['UNK',-1]]
@@ -187,7 +188,6 @@ with graph.as_default():
 
 	saver=tf.train.Saver()
 
-num_steps=100001
 
 with tf.Session(graph=graph) as session:
 	writer=tf.summary.FileWriter(FLAGS.log_dir,session.graph)
@@ -269,6 +269,9 @@ def plot_with_labels(low_dim_embs, labels, filename):
 try:
 	from sklearn.manifold import TSNE
 	import matplotlib.pyplot as plt
+	import matplotlib
+
+	matplotlib.rcParams['font.family']='SimHei'
 
 	tsne=TSNE(
 		perplexity=30, n_components=2,init='pca',n_iter=5000,method='exact'
