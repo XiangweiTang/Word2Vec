@@ -1,2 +1,2 @@
-model_checkpoint_path: "d:\\private\\Word2Vec\\log\\model.ckpt"
-all_model_checkpoint_paths: "d:\\private\\Word2Vec\\log\\model.ckpt"
+model_checkpoint_path: "d:\\Files\\Python\\Word2Vec\\log\\model.ckpt"
+all_model_checkpoint_paths: "d:\\Files\\Python\\Word2Vec\\log\\model.ckpt"
