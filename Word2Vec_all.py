@@ -57,7 +57,8 @@ def read_data(filename):
 		data=tf.compat.as_str(f.read(f.namelist()[0])).split()
 	return data
 
-recuit_wbr="total.txt"
+input_file_name="personaldev_wbr.txt"
+imageName="personaldev.png"
 
 def read_to_word(filename):
 	with open(filename,'r',encoding='UTF-8') as f:
@@ -65,7 +66,7 @@ def read_to_word(filename):
 			for word in line.split():
 				yield word
 
-vocabulary=list(read_to_word(recuit_wbr))
+vocabulary=list(read_to_word(input_file_name))
 print('Data size ', len(vocabulary))
 
 #	Build dictionary, replace rare words with UNK.
@@ -279,7 +280,7 @@ try:
 	plot_only=500
 	low_dim_embs=tsne.fit_transform(final_embeddings[:plot_only,:])
 	labels=[reversed_dictionary[i] for i in xrange(plot_only)]
-	plot_with_labels(low_dim_embs,labels,os.path.join(gettempdir(),'tsne_total.png'))
+	plot_with_labels(low_dim_embs,labels,imageName)
 
 except ImportError as ex:
 	print('Please install sklearn, matplotlib and scipy to show embeddings.')
