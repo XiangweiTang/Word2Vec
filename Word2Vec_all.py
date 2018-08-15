@@ -57,8 +57,8 @@ def read_data(filename):
 		data=tf.compat.as_str(f.read(f.namelist()[0])).split()
 	return data
 
-input_file_name="personaldev_wbr.txt"
-imageName="personaldev.png"
+input_file_name="total.wbr"
+imageName="total.png"
 
 def read_to_word(filename):
 	with open(filename,'r',encoding='UTF-8') as f:
