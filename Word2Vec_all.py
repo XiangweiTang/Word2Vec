@@ -70,7 +70,7 @@ vocabulary=list(read_to_word(input_file_name))
 print('Data size ', len(vocabulary))
 
 #	Build dictionary, replace rare words with UNK.
-vocabulary_size=20000
+vocabulary_size=50000
 num_steps=100001
 
 def build_dataset(words, n_words):
@@ -141,16 +141,17 @@ skip_window=1
 num_skips=2
 num_sampled=64
 
-valid_size=16
+valid_size=10
 valid_window=100
+ex_list=["待遇","薪资","入职","发展","升职","加薪","项目","公司","考虑","水平"]
+ex=np.array(list( map(lambda x:dictionary[x],ex_list)),dtype=np.int32)
 valid_examples=np.random.choice(valid_window,valid_size,replace=False)
-
 graph=tf.Graph()
 
 with graph.as_default():
 	train_inputs=tf.placeholder(tf.int32,shape=[batch_size])
 	train_labels=tf.placeholder(tf.int32,shape=[batch_size,1])
-	valid_dataset=tf.constant(valid_examples,dtype=tf.int32)
+	valid_dataset=tf.constant(ex,dtype=tf.int32)
 
 	with tf.device('/cpu:0'):
 		with tf.name_scope('embeddings'):
@@ -175,7 +176,7 @@ with graph.as_default():
 	tf.summary.scalar('loss',loss)
 
 	with tf.name_scope('optimizer'):
-		optimizer=tf.train.GradientDescentOptimizer(1.0).minimize(loss)
+		optimizer=tf.train.GradientDescentOptimizer(0.8).minimize(loss)
 	
 	norm=tf.sqrt(tf.reduce_sum(tf.square(embeddings),1,keepdims=True))
 	normalized_embeddings=embeddings/norm
@@ -226,7 +227,7 @@ with tf.Session(graph=graph) as session:
 		if step%10000==0:
 			sim=similarity.eval()
 			for i in xrange(valid_size):
-				valid_word=reversed_dictionary[valid_examples[i]]
+				valid_word=reversed_dictionary[ex[i]]
 				top_k=8
 				nearest=(-sim[i, :]).argsort()[1:top_k+1]
 				log_str='Nearst to  %s: '%valid_word
