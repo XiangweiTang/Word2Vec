@@ -97,6 +97,11 @@ def build_dataset(words, n_words):
 data, count, dictionary, reversed_dictionary=build_dataset(vocabulary,vocabulary_size)
 del vocabulary
 
+with open("dict.txt","w",encoding='UTF-8') as f:
+	for key in dictionary:
+		f.write("{}\t{}\n".format(key,dictionary[key]))
+
+
 print('Most common words (+UNK) ',count[:5])
 print('Sample data ',data[:10],[reversed_dictionary[i] for i in data[:10]])
 
