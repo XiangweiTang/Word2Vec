@@ -59,6 +59,7 @@ def read_data(filename):
 
 input_file_name="total.wbr"
 imageName="total.png"
+similar_path="similar.txt"
 
 def read_to_word(filename):
 	with open(filename,'r',encoding='UTF-8') as f:
@@ -240,6 +241,25 @@ with tf.Session(graph=graph) as session:
 					close_word=reversed_dictionary[nearest[k]]
 					log_str='%s %s, '%(log_str,close_word)
 				print(log_str)
+	results=[]
+	final_sim=similarity.eval()	
+
+	for i in xrange(valid_size):
+		valid_word=reversed_dictionary[ex[i]]
+		top_k=10
+		nearest=(-final_sim[i,:]).argsort()[1:top_k+1]
+		line=valid_word
+		for k in xrange(top_k):
+			close_word=reversed_dictionary[nearest[k]]
+			line="%s\t%s"%(line,close_word)
+		results.append(line)
+
+	with open(similar_path,'w+',encoding="UTF-8") as f:
+		for result in results:
+			f.write("%s\n"%result)
+	f.close()
+
+
 	final_embeddings=normalized_embeddings.eval()	
 
 	with open(FLAGS.log_dir+'/metadata.tsv','w', encoding="UTF-8") as f:
@@ -257,37 +277,37 @@ with tf.Session(graph=graph) as session:
 writer.close()
 
 
-def plot_with_labels(low_dim_embs, labels, filename):
-	assert low_dim_embs.shape[0]>=len(labels), 'More labels than embeddings'
-	plt.figure(figsize=(18,18))
-	for i, label in enumerate(labels):
-		x,y=low_dim_embs[i,:]
-		plt.scatter(x,y)
-		plt.annotate(
-			label,
-			xy=(x,y),
-			xytext=(5,2),
-			textcoords='offset points',
-			ha='right',
-			va='bottom'
-		)	
-	plt.savefig(filename)
+# def plot_with_labels(low_dim_embs, labels, filename):
+# 	assert low_dim_embs.shape[0]>=len(labels), 'More labels than embeddings'
+# 	plt.figure(figsize=(18,18))
+# 	for i, label in enumerate(labels):
+# 		x,y=low_dim_embs[i,:]
+# 		plt.scatter(x,y)
+# 		plt.annotate(
+# 			label,
+# 			xy=(x,y),
+# 			xytext=(5,2),
+# 			textcoords='offset points',
+# 			ha='right',
+# 			va='bottom'
+# 		)	
+# 	plt.savefig(filename)
 
-try:
-	from sklearn.manifold import TSNE
-	import matplotlib.pyplot as plt
-	import matplotlib
+# try:
+# 	from sklearn.manifold import TSNE
+# 	import matplotlib.pyplot as plt
+# 	import matplotlib
 
-	matplotlib.rcParams['font.family']='SimHei'
+# 	matplotlib.rcParams['font.family']='SimHei'
 
-	tsne=TSNE(
-		perplexity=30, n_components=2,init='pca',n_iter=5000,method='exact'
-	)
-	plot_only=500
-	low_dim_embs=tsne.fit_transform(final_embeddings[:plot_only,:])
-	labels=[reversed_dictionary[i] for i in xrange(plot_only)]
-	plot_with_labels(low_dim_embs,labels,imageName)
+# 	tsne=TSNE(
+# 		perplexity=30, n_components=2,init='pca',n_iter=5000,method='exact'
+# 	)
+# 	plot_only=500
+# 	low_dim_embs=tsne.fit_transform(final_embeddings[:plot_only,:])
+# 	labels=[reversed_dictionary[i] for i in xrange(plot_only)]
+# 	plot_with_labels(low_dim_embs,labels,imageName)
 
-except ImportError as ex:
-	print('Please install sklearn, matplotlib and scipy to show embeddings.')
-	print(ex)
+# except ImportError as ex:
+# 	print('Please install sklearn, matplotlib and scipy to show embeddings.')
+# 	print(ex)
