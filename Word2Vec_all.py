@@ -43,6 +43,7 @@ dict_path="dict.txt"
 input_file_name="total.wbr"
 imageName="total.png"
 similar_path="similar.txt"
+test_path="Test.txt"
 
 def read_to_word(filename):
 	with open(filename,'r',encoding='UTF-8') as f:
@@ -71,7 +72,7 @@ def build_dataset(words, n_words):
 		# 	unk_count+=1
 		data.append(index)
 	# count[0][1]=unk_count
-	reversed_dictionary=dict(zip(dictionary.values(),dictionary.keys()))
+	# reversed_dictionary=dict(zip(dictionary.values(),dictionary.keys()))
 	return data#, count, dictionary, reversed_dictionary
 
 def build_dict(dict_path):
@@ -92,6 +93,8 @@ def build_dict(dict_path):
 data=build_dataset(vocabulary,vocabulary_size)
 # del vocabulary
 dictionary, reversed_dictionary=build_dict(dict_path)
+
+
 
 with open("dict.txt","w",encoding='UTF-8') as f:
 	for key in dictionary:
@@ -144,11 +147,20 @@ num_sampled=64
 
 valid_size=10
 valid_window=100
-ex_list=["待遇","薪资","入职","发展","升职","加薪","项目","公司","考虑","水平"]
+
+def read_test(test_path):
+	with open(test_path,'r','UTF-8') as f:
+		for line in f:
+			yield dictionary[line]
+# ex_list=["待遇","薪资","入职","发展","升职","加薪","项目","公司","考虑","水平"]
+ex_list=list(read_test(test_path))
+valid_size=len(ex_list)
 ex=np.array(list( map(lambda x:dictionary[x],ex_list)),dtype=np.int32)
-valid_examples=np.random.choice(valid_window,valid_size,replace=False)
+# valid_examples=np.random.choice(valid_window,valid_size,replace=False)
 graph=tf.Graph()
 
+# totalArray=np.array( dictionary.values(),dtype=np.int32)
+# valid_size=len(totalArray);
 with graph.as_default():
 	train_inputs=tf.placeholder(tf.int32,shape=[batch_size])
 	train_labels=tf.placeholder(tf.int32,shape=[batch_size,1])
@@ -177,7 +189,7 @@ with graph.as_default():
 	tf.summary.scalar('loss',loss)
 
 	with tf.name_scope('optimizer'):
-		optimizer=tf.train.GradientDescentOptimizer(0.8).minimize(loss)
+		optimizer=tf.train.GradientDescentOptimizer(0.4).minimize(loss)
 	
 	norm=tf.sqrt(tf.reduce_sum(tf.square(embeddings),1,keepdims=True))
 	normalized_embeddings=embeddings/norm
