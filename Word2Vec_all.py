@@ -56,7 +56,7 @@ vocabulary=list(read_to_word(input_file_name))
 
 #	Build dictionary, replace rare words with UNK.
 vocabulary_size=50000
-num_steps=100001
+num_steps=200001
 
 def build_dataset(words, n_words):
 	count=[['UNK',-1]]
@@ -149,13 +149,13 @@ valid_size=10
 valid_window=100
 
 def read_test(test_path):
-	with open(test_path,'r','UTF-8') as f:
+	with open(test_path,'r', encoding= 'UTF-8') as f:
 		for line in f:
-			yield dictionary[line]
+			yield dictionary[line[:-1]]
 # ex_list=["待遇","薪资","入职","发展","升职","加薪","项目","公司","考虑","水平"]
 ex_list=list(read_test(test_path))
 valid_size=len(ex_list)
-ex=np.array(list( map(lambda x:dictionary[x],ex_list)),dtype=np.int32)
+ex=np.array(ex_list,dtype=np.int32)
 # valid_examples=np.random.choice(valid_window,valid_size,replace=False)
 graph=tf.Graph()
 
@@ -189,7 +189,7 @@ with graph.as_default():
 	tf.summary.scalar('loss',loss)
 
 	with tf.name_scope('optimizer'):
-		optimizer=tf.train.GradientDescentOptimizer(0.4).minimize(loss)
+		optimizer=tf.train.GradientDescentOptimizer(0.2).minimize(loss)
 	
 	norm=tf.sqrt(tf.reduce_sum(tf.square(embeddings),1,keepdims=True))
 	normalized_embeddings=embeddings/norm
@@ -233,7 +233,7 @@ with tf.Session(graph=graph) as session:
 		if step%2000==0:
 			if(step>0):
 				average_loss/=2000
-			print('Average loss ate step ', step, ': ', average_loss)
+			print('Average loss at step ', step, ': ', average_loss)
 			average_loss=0
 
 	results=[]
